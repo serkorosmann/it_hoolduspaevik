@@ -14,8 +14,19 @@ class LogBook:
         self.entries.append(entry)
 
     def remove_entry(self, created_at):
-        """Kustutab kirje ID (created_at) järgi."""
+        """Kustutab kirje created_at (ID) järgi."""
+        original_count = len(self.entries)
         self.entries = [e for e in self.entries if e.created_at != created_at]
+        return len(self.entries) < original_count
+
+    def find_entries(self, keyword):
+        """Otsib märksõna pealkirjast või kirjeldusest."""
+        keyword = keyword.lower()
+        return [e for e in self.entries if keyword in e.title.lower() or keyword in e.description.lower()]
+
+    def filter_by_status(self, status):
+        """Tagastab kirjed vastavalt staatusele (OPEN/DONE)."""
+        return [e for e in self.entries if e.status == status]
 
     def save_to_json(self, filename="logbook.json"):
         """Salvestab kõik kirjed JSON-faili."""
@@ -24,7 +35,7 @@ class LogBook:
             json.dump(data, f, indent=4, ensure_ascii=False)
 
     def load_from_json(self, filename="logbook.json"):
-        """Laeb kirjed JSON-failist ja teeb neist LogEntry objektid."""
+        """Laeb kirjed JSON-failist."""
         if not os.path.exists(filename):
             return "Faili ei ole, alustame tühja raamatuga."
 
@@ -40,6 +51,6 @@ class LogBook:
                         created_at=item['created_at']
                     )
                     self.entries.append(entry)
-            return f"Laetud {len(self.entries)} kirjet."
+            return f" Laetud {len(self.entries)} kirjet."
         except Exception as e:
-            return f"Viga faili lugemisel: {e}"
+            return f" Viga faili lugemisel: {e}"
